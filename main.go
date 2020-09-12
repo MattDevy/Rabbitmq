@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -54,8 +55,12 @@ func main() {
 	)
 	failOnError(err, "Failed to register a consumer")
 
-	for m := range msgs {
-		log.Printf("Received message: %s", m.Body)
-		m.Ack(false)
-	}
+	go func() {
+		for m := range msgs {
+			log.Printf("Received message: %s", m.Body)
+			m.Ack(false)
+		}
+	}()
+
+	<-time.After(1 * time.Second)
 }
